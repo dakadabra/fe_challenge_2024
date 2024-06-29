@@ -15,6 +15,7 @@ export function App() {
   const { data: transactionsByEmployee, ...transactionsByEmployeeUtils } =
     useTransactionsByEmployee();
   const [isLoading, setIsLoading] = useState(false);
+  const [isAnEmployeeSelected, setIsAnEmployeeSelected] = useState(false);
 
   const transactions = useMemo(
     () => paginatedTransactions?.data ?? transactionsByEmployee ?? null,
@@ -65,8 +66,10 @@ export function App() {
             if (newValue === null) {
               return;
             } else if (newValue.id === "") {
+              setIsAnEmployeeSelected(false);
               await loadAllTransactions();
             } else {
+              setIsAnEmployeeSelected(true);
               await loadTransactionsByEmployee(newValue.id);
             }
           }}
@@ -77,17 +80,19 @@ export function App() {
         <div className="RampGrid">
           <Transactions transactions={transactions} />
 
-          {transactions !== null && (
-            <button
-              className="RampButton"
-              disabled={paginatedTransactionsUtils.loading}
-              onClick={async () => {
-                await loadAllTransactions();
-              }}
-            >
-              View More
-            </button>
-          )}
+          {transactions !== null &&
+            !isAnEmployeeSelected &&
+            paginatedTransactions?.nextPage && (
+              <button
+                className="RampButton"
+                disabled={paginatedTransactionsUtils.loading}
+                onClick={async () => {
+                  await loadAllTransactions();
+                }}
+              >
+                View More
+              </button>
+            )}
         </div>
       </main>
     </Fragment>
